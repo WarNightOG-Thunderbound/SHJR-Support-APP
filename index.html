@@ -40,7 +40,7 @@
             font-weight: 500;
         }
         
-        .auth-container, .chat-container, .admin-container {
+        .auth-container, .chat-container {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
@@ -61,7 +61,7 @@
             font-weight: 500;
         }
         
-        input, select, button {
+        input, button {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -136,27 +136,6 @@
             padding: 0 20px;
         }
         
-        .user-list {
-            margin-bottom: 15px;
-        }
-        
-        .user-item {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .user-item:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .user-item.active {
-            background-color: #e3f2fd;
-            border-color: #bbdefb;
-        }
-        
         .error-message {
             color: #d32f2f;
             margin-top: 5px;
@@ -203,13 +182,6 @@
                     <label for="register-password">Password (min 6 characters)</label>
                     <input type="password" id="register-password" placeholder="Create a password">
                 </div>
-                <div class="form-group">
-                    <label for="register-role">I am a:</label>
-                    <select id="register-role">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
                 <div id="register-error" class="error-message"></div>
                 <button id="register-btn">Register</button>
                 <div class="toggle-auth">
@@ -228,24 +200,6 @@
                 <button id="send-btn">Send</button>
             </div>
         </div>
-        
-        <!-- Admin Container -->
-        <div id="admin-container" class="admin-container">
-            <h2 style="margin-bottom: 15px;">Active Users</h2>
-            <div class="user-list" id="user-list">
-                <div class="loading">Loading users...</div>
-            </div>
-            <div id="admin-chat-area" style="display: none;">
-                <h3 style="margin-bottom: 10px;">Chat with <span id="current-chat-user"></span></h3>
-                <div class="messages" id="admin-messages">
-                    <div class="loading">Loading messages...</div>
-                </div>
-                <div class="message-input">
-                    <input type="text" id="admin-message-input" placeholder="Type your message...">
-                    <button id="admin-send-btn">Send</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Firebase SDK -->
@@ -254,7 +208,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     
     <script>
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBeP_8lxZczuvXNaenECyjiA8OHRWdh9jc",
             authDomain: "supportchatsystem.firebaseapp.com",
@@ -274,7 +228,6 @@
         // DOM Elements
         const authContainer = document.getElementById('auth-container');
         const chatContainer = document.getElementById('chat-container');
-        const adminContainer = document.getElementById('admin-container');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const showRegister = document.getElementById('show-register');
@@ -285,23 +238,14 @@
         const loginPassword = document.getElementById('login-password');
         const registerEmail = document.getElementById('register-email');
         const registerPassword = document.getElementById('register-password');
-        const registerRole = document.getElementById('register-role');
         const loginError = document.getElementById('login-error');
         const registerError = document.getElementById('register-error');
         const messages = document.getElementById('messages');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
-        const userList = document.getElementById('user-list');
-        const adminMessages = document.getElementById('admin-messages');
-        const adminMessageInput = document.getElementById('admin-message-input');
-        const adminSendBtn = document.getElementById('admin-send-btn');
-        const adminChatArea = document.getElementById('admin-chat-area');
-        const currentChatUser = document.getElementById('current-chat-user');
         
         // Global variables
         let currentUser = null;
-        let currentUserRole = null;
-        let selectedUserId = null;
         
         // Toggle between login and register forms
         showRegister.addEventListener('click', (e) => {
@@ -316,11 +260,10 @@
             loginForm.style.display = 'block';
         });
         
-        // Register new user
+        // Register new user (always as user role)
         registerBtn.addEventListener('click', () => {
             const email = registerEmail.value;
             const password = registerPassword.value;
-            const role = registerRole.value;
             
             // Validate email format
             if (!email || !email.includes('@') || !email.includes('.')) {
@@ -334,20 +277,14 @@
                 return;
             }
             
-            // Check if trying to register as admin with unauthorized email
-            if (role === 'admin' && email !== 'warnightog.thunderbound@gmail.com') {
-                registerError.textContent = 'Only authorized emails can register as admin';
-                return;
-            }
-            
             registerError.textContent = '';
             
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    // Save user role to database
+                    // Save user as regular user (no admin option)
                     return database.ref('users/' + userCredential.user.uid).set({
                         email: email,
-                        role: role
+                        role: 'user'
                     });
                 })
                 .then(() => {
@@ -372,23 +309,25 @@
             
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
+                    // Check if user is trying to login as admin from user page
+                    if (email === 'warnightog.thunderbound@gmail.com') {
+                        auth.signOut();
+                        loginError.textContent = 'Admins must login from the admin page';
+                        return;
+                    }
+                    
                     // Get user role from database
                     return database.ref('users/' + userCredential.user.uid).once('value');
                 })
                 .then((snapshot) => {
+                    if (!snapshot) return;
+                    
                     const userData = snapshot.val();
                     currentUser = auth.currentUser;
-                    currentUserRole = userData.role;
                     
-                    // Redirect based on role
-                    if (currentUserRole === 'admin') {
+                    // Only proceed if user is not admin
+                    if (userData.role === 'user') {
                         authContainer.classList.remove('active');
-                        chatContainer.classList.remove('active');
-                        adminContainer.classList.add('active');
-                        setupAdminChat();
-                    } else {
-                        authContainer.classList.remove('active');
-                        adminContainer.classList.remove('active');
                         chatContainer.classList.add('active');
                         setupUserChat();
                     }
@@ -437,111 +376,14 @@
                 messageInput.value = '';
                 
                 // Notify admin of new message
-                if (currentUserRole === 'user') {
-                    database.ref('adminNotifications/' + currentUser.uid).set({
-                        userId: currentUser.uid,
-                        userEmail: currentUser.email,
-                        lastMessage: messageText,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP,
-                        read: false
-                    });
-                }
-            }
-        }
-        
-        // Setup admin chat interface
-        function setupAdminChat() {
-            userList.innerHTML = '';
-            adminChatArea.style.display = 'none';
-            
-            // Reference to admin notifications
-            const notificationsRef = database.ref('adminNotifications');
-            
-            // Listen for active users with messages
-            notificationsRef.orderByChild('timestamp').on('value', (snapshot) => {
-                userList.innerHTML = '';
-                const users = snapshot.val();
-                
-                if (!users) {
-                    userList.innerHTML = '<div class="loading">No active users yet</div>';
-                    return;
-                }
-                
-                Object.keys(users).forEach(userId => {
-                    const user = users[userId];
-                    const userItem = document.createElement('div');
-                    userItem.className = 'user-item';
-                    if (userId === selectedUserId) {
-                        userItem.classList.add('active');
-                    }
-                    userItem.innerHTML = `
-                        <strong>${user.userEmail}</strong>
-                        <p>${user.lastMessage}</p>
-                        <small>${new Date(user.timestamp).toLocaleString()}</small>
-                        ${!user.read ? '<span style="color: red; float: right;">NEW</span>' : ''}
-                    `;
-                    
-                    userItem.addEventListener('click', () => {
-                        selectedUserId = userId;
-                        currentChatUser.textContent = user.userEmail;
-                        adminChatArea.style.display = 'block';
-                        
-                        // Mark as read
-                        database.ref('adminNotifications/' + userId).update({
-                            read: true
-                        });
-                        
-                        // Load chat history
-                        loadAdminChat(userId);
-                    });
-                    
-                    userList.appendChild(userItem);
-                });
-            });
-            
-            // Send message functionality for admin
-            adminSendBtn.addEventListener('click', sendAdminMessage);
-            adminMessageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendAdminMessage();
-                }
-            });
-            
-            function sendAdminMessage() {
-                if (!selectedUserId) return;
-                
-                const messageText = adminMessageInput.value.trim();
-                if (messageText === '') return;
-                
-                const message = {
-                    text: messageText,
-                    sender: currentUser.uid,
-                    senderEmail: currentUser.email,
+                database.ref('adminNotifications/' + currentUser.uid).set({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    lastMessage: messageText,
                     timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    isAdmin: true
-                };
-                
-                // Save message to user's chat
-                database.ref('chats/' + selectedUserId).push(message);
-                adminMessageInput.value = '';
-                
-                // Add to admin's view
-                displayMessage(message, adminMessages);
-                scrollToBottom(adminMessages);
+                    read: false
+                });
             }
-        }
-        
-        // Load chat history for admin
-        function loadAdminChat(userId) {
-            adminMessages.innerHTML = '';
-            
-            const chatRef = database.ref('chats/' + userId);
-            
-            chatRef.on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                displayMessage(message, adminMessages);
-                scrollToBottom(adminMessages);
-            });
         }
         
         // Display a message in the chat
@@ -569,27 +411,22 @@
                     .then((snapshot) => {
                         const userData = snapshot.val();
                         currentUser = user;
-                        currentUserRole = userData.role;
                         
-                        if (currentUserRole === 'admin') {
+                        // Only allow non-admin users here
+                        if (userData.role === 'user') {
                             authContainer.classList.remove('active');
-                            chatContainer.classList.remove('active');
-                            adminContainer.classList.add('active');
-                            setupAdminChat();
-                        } else {
-                            authContainer.classList.remove('active');
-                            adminContainer.classList.remove('active');
                             chatContainer.classList.add('active');
                             setupUserChat();
+                        } else {
+                            // If admin somehow gets here, sign them out
+                            auth.signOut();
                         }
                     });
             } else {
                 // User is signed out
                 authContainer.classList.add('active');
                 chatContainer.classList.remove('active');
-                adminContainer.classList.remove('active');
                 currentUser = null;
-                currentUserRole = null;
             }
         });
     </script>
