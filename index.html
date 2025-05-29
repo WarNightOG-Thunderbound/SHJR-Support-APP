@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHJR.shop Support</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            height: 100vh;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background-color: #6200ee;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .auth-container, .chat-container, .admin-container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #6200ee;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #3700b3;
+        }
+        
+        .toggle-auth {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .toggle-auth a {
+            color: #6200ee;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .messages {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .admin-message {
+            background-color: #f1f1f1;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input input {
+            flex: 1;
+        }
+        
+        .message-input button {
+            width: auto;
+            padding: 0 20px;
+        }
+        
+        .user-list {
+            margin-bottom: 15px;
+        }
+        
+        .user-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .user-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .user-item.active {
+            background-color: #e3f2fd;
+            border-color: #bbdefb;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>SHJR.shop Support</header>
+        
+        <!-- Authentication Container -->
+        <div id="auth-container" class="auth-container active">
+            <div id="login-form">
+                <h2 style="text-align: center; margin-bottom: 20px;">Login</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <div id="login-error" class="error-message"></div>
+                <button id="login-btn">Login</button>
+                <div class="toggle-auth">
+                    Don't have an account? <a href="#" id="show-register">Register</a>
+                </div>
+            </div>
+            
+            <div id="register-form" style="display: none;">
+                <h2 style="text-align: center; margin-bottom: 20px;">Register</h2>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password (min 6 characters)</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="register-role">I am a:</label>
+                    <select id="register-role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div id="register-error" class="error-message"></div>
+                <button id="register-btn">Register</button>
+                <div class="toggle-auth">
+                    Already have an account? <a href="#" id="show-login">Login</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Chat Container -->
+        <div id="chat-container" class="chat-container">
+            <div class="messages" id="messages">
+                <div class="loading">Loading messages...</div>
+            </div>
+            <div class="message-input">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+        
+        <!-- Admin Container -->
+        <div id="admin-container" class="admin-container">
+            <h2 style="margin-bottom: 15px;">Active Users</h2>
+            <div class="user-list" id="user-list">
+                <div class="loading">Loading users...</div>
+            </div>
+            <div id="admin-chat-area" style="display: none;">
+                <h3 style="margin-bottom: 10px;">Chat with <span id="current-chat-user"></span></h3>
+                <div class="messages" id="admin-messages">
+                    <div class="loading">Loading messages...</div>
+                </div>
+                <div class="message-input">
+                    <input type="text" id="admin-message-input" placeholder="Type your message...">
+                    <button id="admin-send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeP_8lxZczuvXNaenECyjiA8OHRWdh9jc",
+            authDomain: "supportchatsystem.firebaseapp.com",
+            databaseURL: "https://supportchatsystem-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "supportchatsystem",
+            storageBucket: "supportchatsystem.firebasestorage.app",
+            messagingSenderId: "416632661967",
+            appId: "1:416632661967:web:21bca6f543963b44c6d4ba",
+            measurementId: "G-VQRKKQV4TV"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const chatContainer = document.getElementById('chat-container');
+        const adminContainer = document.getElementById('admin-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const registerEmail = document.getElementById('register-email');
+        const registerPassword = document.getElementById('register-password');
+        const registerRole = document.getElementById('register-role');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+        const messages = document.getElementById('messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const userList = document.getElementById('user-list');
+        const adminMessages = document.getElementById('admin-messages');
+        const adminMessageInput = document.getElementById('admin-message-input');
+        const adminSendBtn = document.getElementById('admin-send-btn');
+        const adminChatArea = document.getElementById('admin-chat-area');
+        const currentChatUser = document.getElementById('current-chat-user');
+        
+        // Global variables
+        let currentUser = null;
+        let currentUserRole = null;
+        let selectedUserId = null;
+        
+        // Toggle between login and register forms
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+        
+        // Register new user
+        registerBtn.addEventListener('click', () => {
+            const email = registerEmail.value;
+            const password = registerPassword.value;
+            const role = registerRole.value;
+            
+            // Validate email format
+            if (!email || !email.includes('@') || !email.includes('.')) {
+                registerError.textContent = 'Please enter a valid email address';
+                return;
+            }
+            
+            // Validate password length
+            if (password.length < 6) {
+                registerError.textContent = 'Password must be at least 6 characters';
+                return;
+            }
+            
+            // Check if trying to register as admin with unauthorized email
+            if (role === 'admin' && email !== 'warnightog.thunderbound@gmail.com') {
+                registerError.textContent = 'Only authorized emails can register as admin';
+                return;
+            }
+            
+            registerError.textContent = '';
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Save user role to database
+                    return database.ref('users/' + userCredential.user.uid).set({
+                        email: email,
+                        role: role
+                    });
+                })
+                .then(() => {
+                    // Registration successful
+                    alert('Registration successful! Please login.');
+                    registerForm.style.display = 'none';
+                    loginForm.style.display = 'block';
+                    registerEmail.value = '';
+                    registerPassword.value = '';
+                })
+                .catch((error) => {
+                    registerError.textContent = error.message;
+                });
+        });
+        
+        // Login existing user
+        loginBtn.addEventListener('click', () => {
+            const email = loginEmail.value;
+            const password = loginPassword.value;
+            
+            loginError.textContent = '';
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Get user role from database
+                    return database.ref('users/' + userCredential.user.uid).once('value');
+                })
+                .then((snapshot) => {
+                    const userData = snapshot.val();
+                    currentUser = auth.currentUser;
+                    currentUserRole = userData.role;
+                    
+                    // Redirect based on role
+                    if (currentUserRole === 'admin') {
+                        authContainer.classList.remove('active');
+                        chatContainer.classList.remove('active');
+                        adminContainer.classList.add('active');
+                        setupAdminChat();
+                    } else {
+                        authContainer.classList.remove('active');
+                        adminContainer.classList.remove('active');
+                        chatContainer.classList.add('active');
+                        setupUserChat();
+                    }
+                })
+                .catch((error) => {
+                    loginError.textContent = error.message;
+                });
+        });
+        
+        // Setup user chat interface
+        function setupUserChat() {
+            messages.innerHTML = '';
+            
+            // Reference to the chat messages
+            const chatRef = database.ref('chats/' + currentUser.uid);
+            
+            // Listen for new messages
+            chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message, messages);
+                scrollToBottom(messages);
+            });
+            
+            // Send message functionality
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText === '') return;
+                
+                const message = {
+                    text: messageText,
+                    sender: currentUser.uid,
+                    senderEmail: currentUser.email,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    isAdmin: false
+                };
+                
+                // Save message to database
+                chatRef.push(message);
+                messageInput.value = '';
+                
+                // Notify admin of new message
+                if (currentUserRole === 'user') {
+                    database.ref('adminNotifications/' + currentUser.uid).set({
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        lastMessage: messageText,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        read: false
+                    });
+                }
+            }
+        }
+        
+        // Setup admin chat interface
+        function setupAdminChat() {
+            userList.innerHTML = '';
+            adminChatArea.style.display = 'none';
+            
+            // Reference to admin notifications
+            const notificationsRef = database.ref('adminNotifications');
+            
+            // Listen for active users with messages
+            notificationsRef.orderByChild('timestamp').on('value', (snapshot) => {
+                userList.innerHTML = '';
+                const users = snapshot.val();
+                
+                if (!users) {
+                    userList.innerHTML = '<div class="loading">No active users yet</div>';
+                    return;
+                }
+                
+                Object.keys(users).forEach(userId => {
+                    const user = users[userId];
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    if (userId === selectedUserId) {
+                        userItem.classList.add('active');
+                    }
+                    userItem.innerHTML = `
+                        <strong>${user.userEmail}</strong>
+                        <p>${user.lastMessage}</p>
+                        <small>${new Date(user.timestamp).toLocaleString()}</small>
+                        ${!user.read ? '<span style="color: red; float: right;">NEW</span>' : ''}
+                    `;
+                    
+                    userItem.addEventListener('click', () => {
+                        selectedUserId = userId;
+                        currentChatUser.textContent = user.userEmail;
+                        adminChatArea.style.display = 'block';
+                        
+                        // Mark as read
+                        database.ref('adminNotifications/' + userId).update({
+                            read: true
+                        });
+                        
+                        // Load chat history
+                        loadAdminChat(userId);
+                    });
+                    
+                    userList.appendChild(userItem);
+                });
+            });
+            
+            // Send message functionality for admin
+            adminSendBtn.addEventListener('click', sendAdminMessage);
+            adminMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendAdminMessage();
+                }
+            });
+            
+            function sendAdminMessage() {
+                if (!selectedUserId) return;
+                
+                const messageText = adminMessageInput.value.trim();
+                if (messageText === '') return;
+                
+                const message = {
+                    text: messageText,
+                    sender: currentUser.uid,
+                    senderEmail: currentUser.email,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    isAdmin: true
+                };
+                
+                // Save message to user's chat
+                database.ref('chats/' + selectedUserId).push(message);
+                adminMessageInput.value = '';
+                
+                // Add to admin's view
+                displayMessage(message, adminMessages);
+                scrollToBottom(adminMessages);
+            }
+        }
+        
+        // Load chat history for admin
+        function loadAdminChat(userId) {
+            adminMessages.innerHTML = '';
+            
+            const chatRef = database.ref('chats/' + userId);
+            
+            chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message, adminMessages);
+                scrollToBottom(adminMessages);
+            });
+        }
+        
+        // Display a message in the chat
+        function displayMessage(message, container) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.isAdmin ? 'admin-message' : 'user-message'}`;
+            messageDiv.innerHTML = `
+                <strong>${message.isAdmin ? 'Admin' : 'You'}</strong>
+                <p>${message.text}</p>
+                <small>${new Date(message.timestamp).toLocaleTimeString()}</small>
+            `;
+            container.appendChild(messageDiv);
+        }
+        
+        // Scroll to bottom of chat
+        function scrollToBottom(element) {
+            element.scrollTop = element.scrollHeight;
+        }
+        
+        // Check auth state on page load
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                database.ref('users/' + user.uid).once('value')
+                    .then((snapshot) => {
+                        const userData = snapshot.val();
+                        currentUser = user;
+                        currentUserRole = userData.role;
+                        
+                        if (currentUserRole === 'admin') {
+                            authContainer.classList.remove('active');
+                            chatContainer.classList.remove('active');
+                            adminContainer.classList.add('active');
+                            setupAdminChat();
+                        } else {
+                            authContainer.classList.remove('active');
+                            adminContainer.classList.remove('active');
+                            chatContainer.classList.add('active');
+                            setupUserChat();
+                        }
+                    });
+            } else {
+                // User is signed out
+                authContainer.classList.add('active');
+                chatContainer.classList.remove('active');
+                adminContainer.classList.remove('active');
+                currentUser = null;
+                currentUserRole = null;
+            }
+        });
+    </script>
+</body>
+</html>
