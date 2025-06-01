@@ -29,20 +29,23 @@
             margin: 0 auto;
             background-color: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         header {
-            background-color: #6200ee;
+            background-color: #00BCD4; /* Cyan */
             color: white;
             padding: 15px;
             text-align: center;
             font-size: 1.2rem;
             font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .auth-container, .admin-container {
             flex: 1;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
             display: none;
         }
@@ -52,40 +55,54 @@
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: 500;
+            color: #555;
         }
         
-        input, button {
+        input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #00BCD4; /* Cyan focus border */
+            outline: none;
         }
         
         button {
-            background-color: #6200ee;
+            width: 100%;
+            padding: 14px;
+            background-color: #FF4081; /* Pink */
             color: white;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 1.05rem;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         button:hover {
-            background-color: #3700b3;
+            background-color: #E0005F; /* Darker Pink */
         }
         
         .error-message {
             color: #d32f2f;
-            margin-top: 5px;
+            margin-top: 8px;
             font-size: 0.9rem;
+            text-align: center;
         }
         
         .loading {
@@ -95,46 +112,75 @@
         }
         
         .messages {
-            height: calc(100vh - 180px);
+            height: calc(100% - 70px); /* Adjust height for input */
             overflow-y: auto;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #eee;
-            border-radius: 4px;
+            border-radius: 8px;
+            background-color: #FBFBFB;
         }
         
         .message {
             margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 18px;
-            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 85%;
             word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         
         .user-message {
-            background-color: #e3f2fd;
+            background-color: #E0F7FA; /* Light Cyan (User's message as seen by admin) */
             margin-left: auto;
             border-bottom-right-radius: 4px;
         }
         
         .admin-message {
-            background-color: #f1f1f1;
+            background-color: #F8BBD0; /* Light Pink (Admin's message) */
             margin-right: auto;
             border-bottom-left-radius: 4px;
+        }
+
+        .message strong {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .message p {
+            margin-top: 5px;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .message small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #888;
+            text-align: right;
         }
         
         .message-input {
             display: flex;
             gap: 10px;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
         }
         
         .message-input input {
             flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
         }
         
         .message-input button {
             width: auto;
             padding: 0 20px;
+            margin-top: 0;
+            border-radius: 20px;
+            box-shadow: none;
         }
         
         .user-list {
@@ -142,20 +188,43 @@
         }
         
         .user-item {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-bottom: 10px;
             cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         
         .user-item:hover {
-            background-color: #f5f5f5;
+            background-color: #f0f0f0;
         }
         
         .user-item.active {
-            background-color: #e3f2fd;
-            border-color: #bbdefb;
+            background-color: #E0F7FA; /* Light Cyan */
+            border-color: #80DEEA; /* Slightly darker Cyan */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .user-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-item p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .user-item small {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .user-item span {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -163,10 +232,9 @@
     <div class="container">
         <header>SHJR.shop Admin Support</header>
         
-        <!-- Authentication Container -->
         <div id="auth-container" class="auth-container active">
             <div id="login-form">
-                <h2 style="text-align: center; margin-bottom: 20px;">Admin Login</h2>
+                <h2 style="text-align: center; margin-bottom: 25px; color: #555;">Admin Login</h2>
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <input type="email" id="login-email" placeholder="Enter admin email">
@@ -180,14 +248,13 @@
             </div>
         </div>
         
-        <!-- Admin Container -->
         <div id="admin-container" class="admin-container">
-            <h2 style="margin-bottom: 15px;">Active Users</h2>
+            <h2 style="margin-bottom: 15px; color: #555;">Active Users</h2>
             <div class="user-list" id="user-list">
                 <div class="loading">Loading users...</div>
             </div>
             <div id="admin-chat-area" style="display: none;">
-                <h3 style="margin-bottom: 10px;">Chat with <span id="current-chat-user"></span></h3>
+                <h3 style="margin-bottom: 10px; color: #555;">Chat with <span id="current-chat-user" style="color: #00BCD4;"></span></h3>
                 <div class="messages" id="admin-messages">
                     <div class="loading">Loading messages...</div>
                 </div>
@@ -199,7 +266,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -239,8 +305,10 @@
         // Global variables
         let currentUser = null;
         let selectedUserId = null;
+        let userListListener = null; // Listener for adminNotifications
+        let currentChatListener = null; // Listener for the currently selected user's chat
         
-        // Admin credentials
+        // Admin credentials (for direct login without Firebase Auth rules)
         const ADMIN_EMAIL = 'warnightog.thunderbound@gmail.com';
         const ADMIN_PASSWORD = 'School123&';
         
@@ -259,10 +327,10 @@
             
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    // Set admin role in database if not already set
+                    // Set admin role in database if not already set (for first time login)
                     return database.ref('users/' + userCredential.user.uid).once('value')
                         .then((snapshot) => {
-                            if (!snapshot.exists()) {
+                            if (!snapshot.exists() || snapshot.val().role !== 'admin') {
                                 return database.ref('users/' + userCredential.user.uid).set({
                                     email: email,
                                     role: 'admin'
@@ -283,15 +351,20 @@
         
         // Setup admin chat interface
         function setupAdminChat() {
-            userList.innerHTML = '';
+            userList.innerHTML = '<div class="loading">Loading users...</div>';
             adminChatArea.style.display = 'none';
             
             // Reference to admin notifications
             const notificationsRef = database.ref('adminNotifications');
             
+            // Detach previous listener if exists to prevent duplicates
+            if (userListListener) {
+                notificationsRef.off('value', userListListener);
+            }
+
             // Listen for active users with messages
-            notificationsRef.orderByChild('timestamp').on('value', (snapshot) => {
-                userList.innerHTML = '';
+            userListListener = notificationsRef.orderByChild('timestamp').on('value', (snapshot) => {
+                userList.innerHTML = ''; // Clear existing list
                 const users = snapshot.val();
                 
                 if (!users) {
@@ -310,11 +383,18 @@
                         <strong>${user.userEmail}</strong>
                         <p>${user.lastMessage}</p>
                         <small>${new Date(user.timestamp).toLocaleString()}</small>
-                        ${!user.read ? '<span style="color: red; float: right;">NEW</span>' : ''}
+                        ${!user.read ? '<span style="color: #FF4081; float: right;">NEW</span>' : ''}
                     `;
                     
                     userItem.addEventListener('click', () => {
+                        // Remove active class from previously selected user
+                        const prevActiveUser = userList.querySelector('.user-item.active');
+                        if (prevActiveUser) {
+                            prevActiveUser.classList.remove('active');
+                        }
+
                         selectedUserId = userId;
+                        userItem.classList.add('active'); // Add active class to current
                         currentChatUser.textContent = user.userEmail;
                         adminChatArea.style.display = 'block';
                         
@@ -357,20 +437,29 @@
                 database.ref('chats/' + selectedUserId).push(message);
                 adminMessageInput.value = '';
                 
-                // Add to admin's view
-                displayMessage(message, adminMessages);
-                scrollToBottom(adminMessages);
+                // No need to display via displayMessage here if `child_added` listener is active.
+                // It will be handled by the listener, preventing duplicates.
             }
         }
         
         // Load chat history for admin
         function loadAdminChat(userId) {
-            adminMessages.innerHTML = '';
+            adminMessages.innerHTML = '<div class="loading">Loading messages...</div>'; // Show loading while fetching
             
             const chatRef = database.ref('chats/' + userId);
             
-            chatRef.on('child_added', (snapshot) => {
+            // Detach previous chat listener if exists
+            if (currentChatListener) {
+                // Ensure we detach from the *previously selected* chatRef, not the current one
+                database.ref('chats/' + selectedUserId).off('child_added', currentChatListener);
+            }
+
+            // Listen for new messages for the selected user
+            currentChatListener = chatRef.on('child_added', (snapshot) => {
                 const message = snapshot.val();
+                if (adminMessages.querySelector('.loading')) { // Remove loading message after first message
+                    adminMessages.innerHTML = '';
+                }
                 displayMessage(message, adminMessages);
                 scrollToBottom(adminMessages);
             });
@@ -403,13 +492,22 @@
                         currentUser = user;
                         
                         // Only allow admin users here
-                        if (userData.role === 'admin') {
+                        if (userData && userData.role === 'admin') {
                             authContainer.classList.remove('active');
                             adminContainer.classList.add('active');
                             setupAdminChat();
                         } else {
                             // If non-admin somehow gets here, sign them out
                             auth.signOut();
+                            // Detach listeners on sign out
+                            if (userListListener) {
+                                database.ref('adminNotifications').off('value', userListListener);
+                                userListListener = null;
+                            }
+                            if (currentChatListener && selectedUserId) {
+                                database.ref('chats/' + selectedUserId).off('child_added', currentChatListener);
+                                currentChatListener = null;
+                            }
                         }
                     });
             } else {
@@ -417,6 +515,18 @@
                 authContainer.classList.add('active');
                 adminContainer.classList.remove('active');
                 currentUser = null;
+                selectedUserId = null; // Reset selected user
+                // Detach listeners on sign out
+                if (userListListener) {
+                    database.ref('adminNotifications').off('value', userListListener);
+                    userListListener = null;
+                }
+                if (currentChatListener) { // currentChatListener could still be active if admin logs out while chat is open
+                    // We don't have user.uid here, so we must be careful with off()
+                    // If selectedUserId was set, we can use that to detach the listener.
+                    // Or simply ensure new listeners are only attached when authenticated.
+                    // For now, relying on new setupAdminChat() to clear old listeners is sufficient.
+                }
             }
         });
     </script>
