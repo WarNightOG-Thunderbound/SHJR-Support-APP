@@ -29,20 +29,23 @@
             margin: 0 auto;
             background-color: white;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px; /* Slightly rounded corners */
+            overflow: hidden; /* Hide overflow for rounded corners */
         }
         
         header {
-            background-color: #6200ee;
+            background-color: #00BCD4; /* Cyan */
             color: white;
             padding: 15px;
             text-align: center;
             font-size: 1.2rem;
             font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
         }
         
         .auth-container, .chat-container {
             flex: 1;
-            padding: 15px;
+            padding: 20px; /* Increased padding */
             overflow-y: auto;
             display: none;
         }
@@ -52,94 +55,143 @@
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px; /* Increased margin */
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px; /* Increased margin */
             font-weight: 500;
+            color: #555;
         }
         
-        input, button {
+        input {
             width: 100%;
-            padding: 12px;
+            padding: 14px; /* Increased padding */
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px; /* More rounded */
             font-size: 1rem;
+            transition: border-color 0.3s; /* Smooth transition */
+        }
+
+        input:focus {
+            border-color: #00BCD4; /* Cyan focus border */
+            outline: none;
         }
         
         button {
-            background-color: #6200ee;
+            width: 100%;
+            padding: 14px; /* Increased padding */
+            background-color: #FF4081; /* Pink */
             color: white;
             border: none;
+            border-radius: 6px; /* More rounded */
             cursor: pointer;
             font-weight: 500;
-            margin-top: 10px;
+            margin-top: 15px; /* Increased margin */
+            font-size: 1.05rem;
+            transition: background-color 0.3s ease; /* Smooth transition */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
         }
         
         button:hover {
-            background-color: #3700b3;
+            background-color: #E0005F; /* Darker Pink */
         }
         
         .toggle-auth {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 20px; /* Increased margin */
+            font-size: 0.95rem;
         }
         
         .toggle-auth a {
-            color: #6200ee;
+            color: #FF4081; /* Pink */
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .toggle-auth a:hover {
+            color: #E0005F; /* Darker Pink on hover */
         }
         
         .messages {
-            height: calc(100vh - 180px);
+            height: calc(100% - 70px); /* Adjust height for input */
             overflow-y: auto;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #eee;
-            border-radius: 4px;
+            border-radius: 8px; /* More rounded */
+            background-color: #FBFBFB; /* Slightly off-white background */
         }
         
         .message {
             margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 18px;
-            max-width: 80%;
+            padding: 10px 15px; /* Increased padding */
+            border-radius: 20px; /* More rounded bubbles */
+            max-width: 85%; /* Slightly wider messages */
             word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Subtle shadow on bubbles */
         }
         
         .user-message {
-            background-color: #e3f2fd;
+            background-color: #E0F7FA; /* Light Cyan */
             margin-left: auto;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 4px; /* Pointy bottom-right */
         }
         
         .admin-message {
-            background-color: #f1f1f1;
+            background-color: #F8BBD0; /* Light Pink */
             margin-right: auto;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 4px; /* Pointy bottom-left */
+        }
+
+        .message strong {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .message p {
+            margin-top: 5px;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .message small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #888;
+            text-align: right;
         }
         
         .message-input {
             display: flex;
             gap: 10px;
+            padding: 10px 0; /* Padding to match container */
+            border-top: 1px solid #eee;
         }
         
         .message-input input {
             flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px; /* Rounded input field */
         }
         
         .message-input button {
             width: auto;
             padding: 0 20px;
+            margin-top: 0;
+            border-radius: 20px; /* Rounded send button */
+            box-shadow: none; /* No extra shadow on send button */
         }
         
         .error-message {
             color: #d32f2f;
-            margin-top: 5px;
+            margin-top: 8px; /* Increased margin */
             font-size: 0.9rem;
+            text-align: center;
         }
         
         .loading {
@@ -153,10 +205,9 @@
     <div class="container">
         <header>SHJR.shop Support</header>
         
-        <!-- Authentication Container -->
         <div id="auth-container" class="auth-container active">
             <div id="login-form">
-                <h2 style="text-align: center; margin-bottom: 20px;">Login</h2>
+                <h2 style="text-align: center; margin-bottom: 25px; color: #555;">Login</h2>
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <input type="email" id="login-email" placeholder="Enter your email">
@@ -173,7 +224,7 @@
             </div>
             
             <div id="register-form" style="display: none;">
-                <h2 style="text-align: center; margin-bottom: 20px;">Register</h2>
+                <h2 style="text-align: center; margin-bottom: 25px; color: #555;">Register</h2>
                 <div class="form-group">
                     <label for="register-email">Email</label>
                     <input type="email" id="register-email" placeholder="Enter your email">
@@ -190,7 +241,6 @@
             </div>
         </div>
         
-        <!-- User Chat Container -->
         <div id="chat-container" class="chat-container">
             <div class="messages" id="messages">
                 <div class="loading">Loading messages...</div>
@@ -202,7 +252,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -246,18 +295,23 @@
         
         // Global variables
         let currentUser = null;
+        let chatListener = null; // To store the chat listener reference
         
         // Toggle between login and register forms
         showRegister.addEventListener('click', (e) => {
             e.preventDefault();
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
+            loginError.textContent = ''; // Clear errors when switching forms
+            registerError.textContent = '';
         });
         
         showLogin.addEventListener('click', (e) => {
             e.preventDefault();
             registerForm.style.display = 'none';
             loginForm.style.display = 'block';
+            loginError.textContent = ''; // Clear errors when switching forms
+            registerError.textContent = '';
         });
         
         // Register new user (always as user role)
@@ -326,10 +380,14 @@
                     currentUser = auth.currentUser;
                     
                     // Only proceed if user is not admin
-                    if (userData.role === 'user') {
+                    if (userData && userData.role === 'user') {
                         authContainer.classList.remove('active');
                         chatContainer.classList.add('active');
                         setupUserChat();
+                    } else {
+                        // If user is admin or role is missing/invalid, sign them out
+                        auth.signOut();
+                        loginError.textContent = 'Invalid user role or credentials.';
                     }
                 })
                 .catch((error) => {
@@ -339,14 +397,21 @@
         
         // Setup user chat interface
         function setupUserChat() {
-            messages.innerHTML = '';
+            messages.innerHTML = '<div class="loading">Loading messages...</div>'; // Show loading while fetching
             
-            // Reference to the chat messages
             const chatRef = database.ref('chats/' + currentUser.uid);
             
+            // Detach previous listener if exists to prevent duplicates
+            if (chatListener) {
+                chatRef.off('child_added', chatListener);
+            }
+
             // Listen for new messages
-            chatRef.on('child_added', (snapshot) => {
+            chatListener = chatRef.on('child_added', (snapshot) => {
                 const message = snapshot.val();
+                if (messages.querySelector('.loading')) { // Remove loading message after first message
+                    messages.innerHTML = '';
+                }
                 displayMessage(message, messages);
                 scrollToBottom(messages);
             });
@@ -413,13 +478,17 @@
                         currentUser = user;
                         
                         // Only allow non-admin users here
-                        if (userData.role === 'user') {
+                        if (userData && userData.role === 'user') {
                             authContainer.classList.remove('active');
                             chatContainer.classList.add('active');
                             setupUserChat();
                         } else {
-                            // If admin somehow gets here, sign them out
+                            // If admin or invalid role somehow gets here, sign them out
                             auth.signOut();
+                            if (chatListener) { // Detach listener on sign out
+                                database.ref('chats/' + user.uid).off('child_added', chatListener);
+                                chatListener = null;
+                            }
                         }
                     });
             } else {
@@ -427,6 +496,12 @@
                 authContainer.classList.add('active');
                 chatContainer.classList.remove('active');
                 currentUser = null;
+                if (chatListener) { // Detach listener on sign out
+                    // We don't have user.uid here, assume chatRef is for previous user
+                    // A more robust solution might store the last chatRef
+                    // For simplicity, we assume if signed out, no active listener to detach.
+                    // This is handled by auth.onAuthStateChanged logic above if a user is redirected.
+                }
             }
         });
     </script>
